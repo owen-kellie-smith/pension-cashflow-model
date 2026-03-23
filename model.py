@@ -4,15 +4,15 @@ from helpers import read_excel_mortality_table, formatNum, survival_function
 
 # Read mortality table using function defined in helpers.py
 mortality = read_excel_mortality_table("assets/xls/pma92.xls")
-print("\nMortality table (head, ... tail):")
-print(mortality.head())
-print("\n ... ")
-print(mortality.tail())
+#print("\nMortality table (head, ... tail):")
+#print(mortality.head())
+#print("\n ... ")
+#print(mortality.tail())
 
-print(f"\n {survival_function(65, 5, mortality)}")
+#print(f"\n {survival_function(65, 5, mortality)}")
 
 discount_rate = 0.03
-starting_age = 65
+starting_age = 65.001
 base_benefit = 10000
 
 n_years = 5
@@ -62,11 +62,11 @@ data["present_value_formatted"] = data["present_value"].apply(formatNum)
 # -----------------------------
 # Print output
 # -----------------------------
-print("\nData Frame (entire):")
-print(data)
-print("\n")
+#print("\nData Frame (entire):")
+#print(data)
+#print("\n")
 
-print(data[["year", "discount_factor", "present_value_formatted"]].to_string(index=False))
+#print(data[["year", "discount_factor", "present_value_formatted"]].to_string(index=False))
 print("\nPension Cashflow Table:")
 print(data[["year", "cashflow_formatted", "present_value_formatted"]].to_string(index=False))
 # index = False: leave out the 0,1,2,... row count
