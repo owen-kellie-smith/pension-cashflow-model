@@ -1,6 +1,6 @@
 # pension-cashflow-model
 
-![Python Tests](https://github.com/<username>/<repo>/actions/workflows/ci.yml/badge.svg)
+![Python Tests](https://github.com/owen-kellie-smith/pension-cashflow-model/actions/workflows/ci.yml/badge.svg)
 
 A simple actuarial-style model written in Python.
 
