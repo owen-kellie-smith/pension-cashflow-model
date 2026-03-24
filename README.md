@@ -26,6 +26,15 @@ venv\Scripts\activate         # Windows
 ```bash
 pytest
 ```
+and expect all tests to pass.
+
+## Run the test coverage
+
+```bash
+pytest --cov=./ --cov-report=html
+```
+and see in `htmlcov/index.html` that test coverage (i.e. code run through some test) is close to the amount shown on the badge at the top of this README.
+
 
 ## Run the model
 
