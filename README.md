@@ -61,7 +61,7 @@ Total           100,000.00          90,067.69               77,290.40
 ```
 where cashflow_formatted are expected amounts of 10,000 paid at the end of each year to survivors age 65 at the start of year 1, and present_value_formatted are the expected amounts discounted at 3% p.a. E.g. 9,590.18 = 9,877.89 / 1.03, and  9,877.89 = 10,000 * (1 - 0.012211), and 0.012211 = q65 in pma92.xls.
 
-## Run the model for all records defined in a model point file
+## Run the model for all records specified in a model point file
 
 Aggregate over all indices (i.e. over all projection years and all records) to get a single sum:
 ```bash
