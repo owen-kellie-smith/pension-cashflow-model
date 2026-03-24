@@ -17,7 +17,7 @@ def parse_args():
     parser.add_argument("-n", "--projection_years", type=int, required=True,
                         help="Number of years to project")
     parser.add_argument("-r", "--interest_rate", type=float, required=True,
-                        help="Annual interest rate (e.g., 0.03 for 3%%)")
+                        help="Annual interest rate (e.g., 0.03 for 3pc)")
     parser.add_argument("-agg", "--aggregation_type", required=True,
                         choices=["year_record", "sum_year", "sum_record", "sum"],
                         help="Aggregation type")
