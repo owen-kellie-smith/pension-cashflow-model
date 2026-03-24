@@ -56,7 +56,7 @@ Total          47,814.78               43,840.71
 ```
 where cashflow_formatted are expected amounts of 10,000 paid at the end of each year to survivors age 65 at the start of year 1, and present_value_formatted are the expected amounts discounted at 3% p.a. 
 
-## Run the model for multiple records reading features from with model point features names in the command line
+## Run the model for multiple records defined in a model point file
 
 ```bash
 python3 run_model.py -mp assets/csv/MPF.csv -a assets/xls -n 10 -r 0.03 -agg sum
