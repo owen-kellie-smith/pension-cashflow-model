@@ -9,7 +9,7 @@ A simple actuarial-style model written in Python.
 
 Features:
 - reads mortality rates from a standard spreadsheet (.xls)
-- reads model points from a model point file
+- reads model points from a model point file (.csv)
 - calculates present value of cashflows as benefit amounts * expected survival rate * discount factor
 - aggregates results over various indices
 - write results to .csv file (optional)
