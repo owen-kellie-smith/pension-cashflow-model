@@ -67,6 +67,7 @@ def test_calculate_pension_cashflows_edge_cases():
 def test_print_pension_table_output(capsys):
     df = pd.DataFrame({
         "year": [1, 2, "Total"],
+        "benefit_pp_formatted": ["110", "120", "250"],
         "cashflow_formatted": ["100", "100", "200"],
         "present_value_formatted": ["90", "85", "175"]
     })
