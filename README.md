@@ -41,7 +41,7 @@ and see in `htmlcov/index.html` that test coverage (i.e. code run through some t
 ## Run the model for a single record specified in the command line
 
 ```bash
-python3 model.py -mort "assets/xls/pma92.xls" -age 65 -benefit 10000 -n5 -r 0.03
+python3 model.py -mort "assets/xls/pma92.xls" -age 65 -benefit 10000 -n10 -r 0.03
 ```
 to get output like
 ```
@@ -52,7 +52,12 @@ Pension Cashflow Table:
     3           9,582.60                8,769.43
     4           9,406.26                8,357.34
     5           9,208.75                7,943.55
-Total          47,814.78               43,840.71
+    6           8,988.65                7,527.85
+    7           8,744.72                7,110.26
+    8           8,475.98                6,691.02
+    9           8,181.75                6,270.63
+   10           7,861.81                5,849.92
+Total          90,067.69               77,290.40
 ```
 where cashflow_formatted are expected amounts of 10,000 paid at the end of each year to survivors age 65 at the start of year 1, and present_value_formatted are the expected amounts discounted at 3% p.a. 
 
