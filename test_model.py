@@ -1,5 +1,6 @@
 import pandas as pd
 from model import calculate_pension_cashflows, print_pension_table
+from unittest.mock import patch, MagicMock
 
 def test_calculate_pension_cashflows_with_df():
     # Create a mock mortality table
@@ -76,3 +77,40 @@ def test_print_pension_table_output(capsys):
     assert "Pension Cashflow Table" in captured.out
     assert "100" in captured.out
     assert "200" in captured.out
+
+
+# test_model_cli.py
+import pytest
+from unittest.mock import patch
+import model
+
+def test_main_cli(monkeypatch):
+    # Fake command-line arguments
+    test_args = [
+        "prog",
+        "-mort", "fake_mort.xlsx",
+        "-age", "30",
+        "-benefit", "1000",
+        "-n", "10",
+        "-r", "0.05"
+    ]
+    monkeypatch.setattr("sys.argv", test_args)
+
+    # Mock calculate_pension_cashflows and print_pension_table
+    mock_df = "mocked_dataframe"
+    with patch("model.calculate_pension_cashflows", return_value=mock_df) as mock_calc, \
+         patch("model.print_pension_table") as mock_print:
+        # Call the CLI function
+        model.main_cli()
+
+        # Check that calculate_pension_cashflows was called correctly
+        mock_calc.assert_called_once_with(
+            mortality_file="fake_mort.xlsx",
+            starting_age=30.0,
+            base_benefit=1000.0,
+            n_years=10,
+            discount_rate=0.05
+        )
+
+        # Check that print_pension_table was called with the mock DataFrame
+        mock_print.assert_called_once_with(mock_df)

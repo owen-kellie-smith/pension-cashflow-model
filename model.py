@@ -76,19 +76,18 @@ def print_pension_table(df: pd.DataFrame):
 
 
 # -----------------------------
-# CLI: only run if script is executed directly
+# CLI main function
 # -----------------------------
-if __name__ == "__main__":
+def main_cli():
     parser = argparse.ArgumentParser(description="Calculate and display pension cashflow table.")
     parser.add_argument("-mort", "--mortality_file", required=True, help="Path to mortality Excel file")
     parser.add_argument("-age", "--starting_age", type=float, required=True, help="Starting age")
     parser.add_argument("-benefit", "--base_benefit", type=float, default=10000, help="Base annual benefit per person")
     parser.add_argument("-n", "--n_years", type=int, default=5, help="Number of years to project")
     parser.add_argument("-r", "--discount_rate", type=float, default=0.03, help="Discount rate (e.g., 0.03 for 3%)")
-
+    
     args = parser.parse_args()
 
-    # Calculate pension cashflows
     df = calculate_pension_cashflows(
         mortality_file=args.mortality_file,
         starting_age=args.starting_age,
@@ -97,5 +96,8 @@ if __name__ == "__main__":
         discount_rate=args.discount_rate
     )
 
-    # Print to screen
     print_pension_table(df)
+
+# Keep the original behavior
+if __name__ == "__main__":
+    main_cli()
