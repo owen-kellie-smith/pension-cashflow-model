@@ -66,6 +66,8 @@ to get output like
      benefit_pp     cashflow  present_value
 All    500000.0  452801.3762    388434.6276
 ```
+The total benefit_pp of 500,000 comes from the fact that in the model point file benefit_pa happens to be 10,000 for each of 5 records.  
+5 records * 10,000 / year (per record) * 10 projected years = 500,000.  
 
 or split results out by projection year
 ```bash
@@ -86,6 +88,7 @@ year
 9        50000.0  41368.854291   31705.782127
 10       50000.0  39853.090316   29654.441994
 ```
+In this case the benefit_pp of 50,000 per year is simply 5 records * 10,000 / year (per record) = 50,000 per year.  
 
 
 
