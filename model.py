@@ -84,7 +84,7 @@ def main_cli():
     parser.add_argument("-age", "--starting_age", type=float, required=True, help="Starting age")
     parser.add_argument("-benefit", "--base_benefit", type=float, default=10000, help="Base annual benefit per person")
     parser.add_argument("-n", "--n_years", type=int, default=5, help="Number of years to project")
-    parser.add_argument("-r", "--discount_rate", type=float, default=0.03, help="Discount rate (e.g., 0.03 for 3%)")
+    parser.add_argument("-r", "--discount_rate", type=float, default=0.03, help="Discount rate (e.g., 0.03 for 3pc)")
     
     args = parser.parse_args()
 
