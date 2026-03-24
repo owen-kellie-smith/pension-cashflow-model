@@ -26,7 +26,7 @@ def test_calculate_pension_cashflows_with_df():
     # Cashflow values are positive
     assert df["cashflow"].iloc[:-1].sum() > 0
 
-    # Present value is less than cashflow due to discounting
+    # Present value is less than cashflow due to discounting at positive interest rate
     assert all(df["present_value"].iloc[:-1] <= df["cashflow"].iloc[:-1])
     
 # -----------------------------
