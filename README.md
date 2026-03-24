@@ -8,11 +8,11 @@ A simple actuarial-style model written in Python.
 ---
 
 Features:
-- models pension cashflows
 - reads mortality rates from a standard spreadsheet (.xls)
 - reads model points from a model point file
-- calculates discounted liabilities
+- calculates present value of cashflows as benefit amounts * expected survival rate * discount factor
 - aggregates results over various indices
+- write results to .csv file (optional)
 
 # Getting started
 ## Use a virtual environment venv
@@ -65,7 +65,7 @@ where cashflow_formatted are expected amounts of 10,000 paid at the end of each 
 
 Aggregate over all indices (i.e. over all projection years and all records) to get a single sum:
 ```bash
-python3 run_model.py -mp assets/csv/MPF.csv -a assets/xls -n 10 -r 0.03 -agg sum
+python3 run_model.py -mp assets/csv/MPF.csv -a assets/xls -n 10 -r 0.03 -agg sum -o out_sum.csv
 ```
 to get output like
 ```
@@ -77,7 +77,7 @@ The total benefit_pp of 500,000 comes from the fact that in the model point file
 
 Aggregate over records only (i.e. separate results by projection year)
 ```bash
-python3 run_model.py -mp assets/csv/MPF.csv -a assets/xls -n 10 -r 0.03 -agg sum_year
+python3 run_model.py -mp assets/csv/MPF.csv -a assets/xls -n 10 -r 0.03 -agg sum_year -o out_sum_year.csv
 ```
 to get output like
 ```
