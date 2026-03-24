@@ -20,6 +20,9 @@ def read_excel_mortality_table(filepath: str, skip_rows: int = 2, age_col: str =
   # Rename columns
   mortality = mortality.rename(columns={age_col: "age", qx_col: "qx"})
 
+  # Keep only 'age' and 'qx'
+  mortality = mortality[['age', 'qx']]
+
   # Drop any rows where age or qx is NaN
   mortality = mortality.dropna(subset=["age", "qx"])
 
