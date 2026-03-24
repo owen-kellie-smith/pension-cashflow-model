@@ -10,7 +10,9 @@ A simple actuarial-style model written in Python.
 Features:
 - models pension cashflows
 - reads mortality rates from a standard spreadsheet (.xls)
+- reads model points from a model point file
 - calculates discounted liabilities
+- aggregates results over various indices
 
 # Getting started
 ## Use a virtual environment venv
@@ -36,10 +38,10 @@ pytest --cov=./ --cov-report=html
 and see in `htmlcov/index.html` that test coverage (i.e. code run through some test) is close to the amount shown on the badge at the top of this README.
 
 
-## Run the model
+## Run the model for a single record whose features are specified in the command line
 
 ```bash
-python3 model.py -mort "assets/xls/pma92.xls" -age 65
+python3 model.py -mort "assets/xls/pma92.xls" -age 65 -benefit 10000 -n5 -r 0.03
 ```
 to get output like
 ```
@@ -52,6 +54,40 @@ Pension Cashflow Table:
     5           9,208.75                7,943.55
 Total          47,814.78               43,840.71
 ```
-where cashflow_formatted are expected amounts paid at the end of each year to survivors age 65 at the start of year 1, and present_value_formatted are the expected amounts discounted at 3% p.a. 
+where cashflow_formatted are expected amounts of 10,000 paid at the end of each year to survivors age 65 at the start of year 1, and present_value_formatted are the expected amounts discounted at 3% p.a. 
+
+## Run the model for multiple records reading features from with model point features names in the command line
+
+```bash
+python3 run_model.py -mp assets/csv/MPF.csv -a assets/xls -n 10 -r 0.03 -agg sum
+```
+to get output like
+```
+     benefit_pp     cashflow  present_value
+All    500000.0  452801.3762    388434.6276
+```
+
+or split results out by projection year
+```bash
+python3 run_model.py -mp assets/csv/MPF.csv -a assets/xls -n 10 -r 0.03 -agg sum_year
+```
+to get output like
+```
+      benefit_pp      cashflow  present_value
+year                                         
+1        50000.0  49416.800000   47977.475728
+2        50000.0  48756.050944   45957.254165
+3        50000.0  48010.369319   43936.289045
+4        50000.0  47172.368719   41912.038626
+5        50000.0  46234.888304   39882.620796
+6        50000.0  45191.209607   37846.926586
+7        50000.0  44035.349616   35804.768972
+8        50000.0  42762.395085   33757.029561
+9        50000.0  41368.854291   31705.782127
+10       50000.0  39853.090316   29654.441994
+```
+
+
+
 
 
