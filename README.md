@@ -38,7 +38,7 @@ pytest --cov=./ --cov-report=html
 and see in `htmlcov/index.html` that test coverage (i.e. code run through some test) is close to the amount shown on the badge at the top of this README.
 
 
-## Run the model for a single record whose features are specified in the command line
+## Run the model for a single record specified in the command line
 
 ```bash
 python3 model.py -mort "assets/xls/pma92.xls" -age 65 -benefit 10000 -n5 -r 0.03
