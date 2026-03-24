@@ -63,6 +63,7 @@ where cashflow_formatted are expected amounts of 10,000 paid at the end of each 
 
 ## Run the model for multiple records defined in a model point file
 
+Aggregate over all indices (i.e. over all projection years and all records) to get a single sum:
 ```bash
 python3 run_model.py -mp assets/csv/MPF.csv -a assets/xls -n 10 -r 0.03 -agg sum
 ```
@@ -74,7 +75,7 @@ All    500000.0  452801.3762    388434.6276
 The total benefit_pp of 500,000 comes from the fact that in the model point file benefit_pa happens to be 10,000 for each of 5 records.  
 5 records * 10,000 / year (per record) * 10 projected years = 500,000.  
 
-or split results out by projection year
+Aggregate over records only (i.e. separate results by projection year)
 ```bash
 python3 run_model.py -mp assets/csv/MPF.csv -a assets/xls -n 10 -r 0.03 -agg sum_year
 ```
