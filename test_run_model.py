@@ -137,7 +137,7 @@ def test_aggregate_results():
 # ------------------------------------------------
 # Test write_output
 # ------------------------------------------------
-def test_write_output(tmp_path):
+def test_write_output(tmp_path, capfd):
     df = pd.DataFrame({"a": [1, 2]})
     file_path = tmp_path / "out.csv"
 
@@ -147,3 +147,5 @@ def test_write_output(tmp_path):
 
     # Overwrite warning
     run_model.write_output(df, str(file_path))
+    captured = capfd.readouterr()
+    assert "already exists and will be overwritten" in captured.out
