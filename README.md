@@ -46,20 +46,20 @@ python3 model.py -mort "assets/xls/pma92.xls" -age 65 -benefit 10000 -n10 -r 0.0
 to get output like
 ```
 Pension Cashflow Table:
- year cashflow_formatted present_value_formatted
-    1           9,877.89                9,590.18
-    2           9,739.28                9,180.21
-    3           9,582.60                8,769.43
-    4           9,406.26                8,357.34
-    5           9,208.75                7,943.55
-    6           8,988.65                7,527.85
-    7           8,744.72                7,110.26
-    8           8,475.98                6,691.02
-    9           8,181.75                6,270.63
-   10           7,861.81                5,849.92
-Total          90,067.69               77,290.40
+ year benefit_pp_formatted cashflow_formatted present_value_formatted
+    1            10,000.00           9,877.89                9,590.18
+    2            10,000.00           9,739.28                9,180.21
+    3            10,000.00           9,582.60                8,769.43
+    4            10,000.00           9,406.26                8,357.34
+    5            10,000.00           9,208.75                7,943.55
+    6            10,000.00           8,988.65                7,527.85
+    7            10,000.00           8,744.72                7,110.26
+    8            10,000.00           8,475.98                6,691.02
+    9            10,000.00           8,181.75                6,270.63
+   10            10,000.00           7,861.81                5,849.92
+Total           100,000.00          90,067.69               77,290.40
 ```
-where cashflow_formatted are expected amounts of 10,000 paid at the end of each year to survivors age 65 at the start of year 1, and present_value_formatted are the expected amounts discounted at 3% p.a. 
+where cashflow_formatted are expected amounts of 10,000 paid at the end of each year to survivors age 65 at the start of year 1, and present_value_formatted are the expected amounts discounted at 3% p.a. E.g. 9,590.18 = 9,877.89 / 1.03, and  9,877.89 = 10,000 * (1 - 0.012211), and 0.012211 = q65 in pma92.xls.
 
 ## Run the model for multiple records defined in a model point file
 

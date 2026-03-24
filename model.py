@@ -47,7 +47,7 @@ def calculate_pension_cashflows(
   # Totals
   # -----------------------------
   # Sum numeric columns
-  total_row = data[["cashflow", "present_value"]].sum()
+  total_row = data[["benefit_pp","cashflow", "present_value"]].sum()
 
   # Add label for non-numeric column
   total_row["year"] = "Total"
@@ -59,6 +59,7 @@ def calculate_pension_cashflows(
   # -----------------------------
   # Optional: formatted columns for display
   # -----------------------------
+  data["benefit_pp_formatted"] = data["benefit_pp"].apply(formatNum)
   data["cashflow_formatted"] = data["cashflow"].apply(formatNum)
   data["present_value_formatted"] = data["present_value"].apply(formatNum)
   return data
@@ -71,7 +72,7 @@ def print_pension_table(df: pd.DataFrame):
   #print(data)
   #print("\n")
   print("\nPension Cashflow Table:")
-  print(df[["year", "cashflow_formatted", "present_value_formatted"]].to_string(index=False))
+  print(df[["year", "benefit_pp_formatted", "cashflow_formatted", "present_value_formatted"]].to_string(index=False))
   # index = False: leave out the 0,1,2,... row count
 
 
