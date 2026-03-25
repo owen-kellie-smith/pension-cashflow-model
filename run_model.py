@@ -2,7 +2,9 @@ import pandas as pd
 import argparse
 import os
 from model import calculate_pension_cashflows
-
+from helpers import read_excel_mortality_table
+import numpy as np
+mortality_cache = {}  
 
 # ------------------------------------------------
 # Argument parsing
@@ -21,10 +23,12 @@ def parse_args():
     parser.add_argument("-agg", "--aggregation_type", required=True,
                         choices=["year_record", "sum_year", "sum_record", "sum"],
                         help="Aggregation type")
-    parser.add_argument("-o", "--output_file", help="Optional CSV output file")
+    parser.add_argument("-o", "--output_file", 
+                        help="Optional CSV output file")
+    parser.add_argument("-rec", "--record", type=int, default=None,
+                        help="Optional: single record (1-based index) from the model point file to process") 
 
     return parser.parse_args()
-
 
 
 # ------------------------------------------------
@@ -33,7 +37,11 @@ def parse_args():
 def read_model_points(path):
     if not os.path.exists(path):
         raise FileNotFoundError(f"Model point file not found: {path}")
-    df = pd.read_csv(path)
+    df = pd.read_csv(path, dtype={
+        "age_at_vdate": np.float64,
+        "benefit_pa": np.float64,
+        "mortality": str
+    })
     return df
 
 
@@ -41,13 +49,21 @@ def read_model_points(path):
 # Run model for one model point
 # ------------------------------------------------
 def run_model_point(row, assets_folder, projection_years, interest_rate):
+    global mortality_cache
 
-    mortality_file = os.path.join(assets_folder, row["mortality"])
+    mortality_file = str(os.path.join(assets_folder, row["mortality"]))
+    # cache mortality tables
+    if mortality_file not in mortality_cache:
+        if not isinstance(mortality_file, str):
+            raise TypeError(f"Expected string for mortality file path, got {type(mortality_file)}")
+        mortality_cache[mortality_file] = read_excel_mortality_table(mortality_file)
+    mortality_df = mortality_cache[mortality_file]
+
     if not os.path.exists(mortality_file):
         raise FileNotFoundError(f"Mortality file not found: {mortality_file}")
 
     df = calculate_pension_cashflows(
-        mortality_file=mortality_file,
+        mortality_df=mortality_df,  # pass pre-loaded mortality data frame
         starting_age=row["age_at_vdate"],
         base_benefit=row["benefit_pa"],
         n_years=projection_years,
@@ -64,6 +80,7 @@ def run_all_model_points(mp_df, args):
 
     results = []
 
+    
     for _, row in mp_df.iterrows():
         df = run_model_point(
             row,

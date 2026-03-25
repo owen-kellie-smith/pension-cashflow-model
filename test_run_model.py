@@ -36,7 +36,7 @@ def test_parse_args(monkeypatch):
 def test_read_model_points(tmp_path):
     # Create a temporary CSV
     csv_file = tmp_path / "mp.csv"
-    df = pd.DataFrame({"age_at_vdate": [30], "benefit_pa": [1000], "mortality": ["mort.csv"]})
+    df = pd.DataFrame({"age_at_vdate": [30.0], "benefit_pa": [1000.0], "mortality": ["mort.csv"]})
     df.to_csv(csv_file, index=False)
 
     result = run_model.read_model_points(str(csv_file))
@@ -50,11 +50,20 @@ def test_read_model_points_file_not_found():
 # ------------------------------------------------
 # Test run_model_point
 # ------------------------------------------------
+@patch("run_model.read_excel_mortality_table")
 @patch("run_model.calculate_pension_cashflows")
-def test_run_model_point(mock_calc, tmp_path):
+def test_run_model_point(mock_calc, mock_read_mort, tmp_path):
+    # Decorators are applied from the bottom up, but 
+    # the mock arguments are passed into the test function from left to right 
+    # corresponding to the decorators from the bottom up.
+    # so mock_calc becomes the replacement for run_model.calculate_pension_cashflows and
+    # and mock_read_mort becomes the replacement for run_model.read_excel_mortality_table
+
     # Setup mock return
     mock_df = pd.DataFrame({"year": [1, 2], "benefit_pp": [100, 200], "cashflow": [100, 200], "present_value": [95, 180]})
+    mockmort_df = pd.DataFrame({"Age": [61, 62], "qx": [0.01, 0.02]})
     mock_calc.return_value = mock_df
+    mock_read_mort.return_value = mockmort_df
 
     # Create fake mortality file
     mortality_file = tmp_path / "mort.csv"
@@ -65,7 +74,7 @@ def test_run_model_point(mock_calc, tmp_path):
 
     pd.testing.assert_frame_equal(df, mock_df)
     mock_calc.assert_called_once_with(
-        mortality_file=str(mortality_file),
+        mortality_df=mockmort_df,
         starting_age=30,
         base_benefit=1000,
         n_years=10,
