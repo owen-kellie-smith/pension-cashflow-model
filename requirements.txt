@@ -1,4 +1,5 @@
 pytest
 pandas
 pytest-cov
+xlrd>=2.0.1
 openpyxl
