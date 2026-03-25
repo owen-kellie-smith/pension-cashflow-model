@@ -1,3 +1,12 @@
 __pycache__/
 *.pyc
 .DS_Store
+.coverage
+.github/workflows/.coverage
+.venv/
+C#/1_Call_Python_script/Run_Python/bin/
+C#/1_Call_Python_script/Run_Python/obj/
+out_sum_year.csv
+output.csv
+venv/
+
