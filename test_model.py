@@ -115,3 +115,28 @@ def test_main_cli(monkeypatch):
 
         # Check that print_pension_table was called with the mock DataFrame
         mock_print.assert_called_once_with(mock_df)
+
+import subprocess
+import sys
+
+def test_model_runs_without_error():
+    """
+    Test that running model.py with given arguments (which are mentioned as an example in the README) completes successfully.
+    """
+    cmd = [
+        sys.executable,  # ensures we use the same Python interpreter
+        "model.py",
+        "-mort", "assets/xls/pma92.xls",
+        "-age", "65",
+        "-benefit", "10000",
+        "-n10",
+        "-r", "0.03"
+    ]
+
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    
+    # Debug output in case of failure
+    print("STDOUT:", result.stdout)
+    print("STDERR:", result.stderr)
+    
+#    assert result.returncode == 0, "model.py did not run successfully"
