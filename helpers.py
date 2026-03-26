@@ -54,7 +54,7 @@ def survival_function(age_start: float, years: int, mortality_df: pd.DataFrame) 
     qx = mortality_df["qx"].values
 
     # Target ages
-    target_ages = age_start + np.arange(years) #np.arange(years) = [0, 1, ..., years-1, years -1]
+    target_ages = age_start + np.arange(years) #np.arange(years) = [0, 1, ..., years-2, years -1]
 
     # NEW: np.interp with explicit bounds handling
     # values below min(ages) -> 0.0 (no death)
