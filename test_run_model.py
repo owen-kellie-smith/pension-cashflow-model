@@ -78,7 +78,8 @@ def test_run_model_point(mock_calc, mock_read_mort, tmp_path):
         starting_age=30,
         base_benefit=1000,
         n_years=10,
-        discount_rate=0.03
+        discount_rate=0.03,
+        debug=False
     )
 
 def test_run_model_point_mortality_file_not_found():
