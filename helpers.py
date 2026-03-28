@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 # pandas is data-processing library
 
-def read_excel_mortality_table(filepath: str, skip_rows: int = 2, age_col: str = "Age x", qx_col: str = "Durations 0+") -> pd.DataFrame:
+def read_excel_mortality_table(filepath: str, skip_rows: int = 2, age_col: str = "Age x", qx_col: str = "Durations 0+", debug: bool=False ) -> pd.DataFrame:
   """
   Reads an Excel mortality table and returns a standardized DataFrame with columns ['age', 'qx'].
 
@@ -33,6 +33,8 @@ def read_excel_mortality_table(filepath: str, skip_rows: int = 2, age_col: str =
   # Transform (possibly changing nothing) to expected data types
   mortality["age"] = mortality["age"].astype(int)
   mortality["qx"] = mortality["qx"].astype(float)
+  if debug:
+      print(f"\n {filepath} mortality:\n {mortality}")
 
   return mortality
 
@@ -44,7 +46,7 @@ def formatNum(x: float) -> str:
   #{ number: format }
 
 
-def survival_function(age_start: float, years: int, mortality_df: pd.DataFrame) -> pd.Series:
+def survival_function(age_start: float, years: int, mortality_df: pd.DataFrame, debug = False) -> pd.Series:
     """
     Vectorized survival probability calculation with correct edge handling.
     """
@@ -62,6 +64,9 @@ def survival_function(age_start: float, years: int, mortality_df: pd.DataFrame) 
     qx_interp = np.interp(target_ages, ages, qx, left=0.0, right=1.0)
 
     survival = np.cumprod(1 - qx_interp)
-
+    if (debug):
+        print("\n age_start:", age_start)
+        print("\n survival:", survival)
+        print("\n pd.Series(survival)", pd.Series(survival))
     return pd.Series(survival)
 

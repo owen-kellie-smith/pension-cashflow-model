@@ -110,7 +110,8 @@ def test_main_cli(monkeypatch):
             starting_age=30.0,
             base_benefit=1000.0,
             n_years=10,
-            discount_rate=0.05
+            discount_rate=0.05,
+            debug=False,
         )
 
         # Check that print_pension_table was called with the mock DataFrame

@@ -9,7 +9,8 @@ def calculate_pension_cashflows(
     starting_age: float = 65,
     base_benefit: float = 10000,
     n_years: int = 5,
-    discount_rate: float = 0.03
+    discount_rate: float = 0.03,
+    debug: bool = False
 ) -> pd.DataFrame:
   # Read mortality table using function defined in helpers.py
   """
@@ -19,7 +20,7 @@ def calculate_pension_cashflows(
   if mortality_df is None:
       if mortality_file is None:
           raise ValueError("Either mortality_file or mortality_df must be provided.")
-      mortality_df = read_excel_mortality_table(mortality_file)
+      mortality_df = read_excel_mortality_table(mortality_file, debug=debug)
   data = pd.DataFrame({
     "year": list(range(1, n_years + 1)),
     "benefit_pp": [base_benefit] * n_years
@@ -29,7 +30,7 @@ def calculate_pension_cashflows(
   # -----------------------------
   # Mortality-weighted cashflows 
   # -----------------------------
-  data["survival_prob"] = survival_function(starting_age, n_years, mortality_df)
+  data["survival_prob"] = survival_function(starting_age, n_years, mortality_df, debug=debug)
   data["cashflow"] = data["benefit_pp"] * data["survival_prob"]
 
   # -----------------------------
@@ -86,6 +87,7 @@ def main_cli():
     parser.add_argument("-benefit", "--base_benefit", type=float, default=10000, help="Base annual benefit per person")
     parser.add_argument("-n", "--n_years", type=int, default=5, help="Number of years to project")
     parser.add_argument("-r", "--discount_rate", type=float, default=0.03, help="Discount rate (e.g., 0.03 for 3pc)")
+    parser.add_argument("-d", "--debug", action="store_true", help="Enable debug mode")
     
     args = parser.parse_args()
 
@@ -94,7 +96,8 @@ def main_cli():
         starting_age=args.starting_age,
         base_benefit=args.base_benefit,
         n_years=args.n_years,
-        discount_rate=args.discount_rate
+        discount_rate=args.discount_rate,
+        debug=args.debug,
     )
 
     print_pension_table(df)
