@@ -1,6 +1,8 @@
 import argparse
+import math
 import os
 import sys
+from typing import NamedTuple, List, Any
 
 import pandas as pd
 import numpy as np
@@ -10,6 +12,14 @@ from helpers import read_excel_mortality_table, copy_all_output_to_log, between
 
 mortality_cache = {}  
 
+#from typing import NamedTuple, Any, List
+
+class ModelPoint(NamedTuple):
+    mortality: str
+    age_at_vdate: float
+    benefit_pa: float
+
+
 # ------------------------------------------------
 # Argument parsing
 # ------------------------------------------------
@@ -18,12 +28,12 @@ def parse_args():
 
     parser.add_argument("-mp", "--model_point_file", required=True, help="Path to model point file (CSV)")
     parser.add_argument("-a", "--assets_folder", required=True, help="Path to assets folder containing mortality files")
-    parser.add_argument("-n", "--projection_years", type=between(0,1000,int), required=True, help="Number of years to project")
-    parser.add_argument("-r", "--interest_rate", type=between(-0.2,0.3), required=True, help="Annual interest rate (e.g., 0.03 for 3pc)")
-    parser.add_argument("-agg", "--aggregation_type", required=True, choices=["year_record", "sum_year", "sum_record", "sum"], help="Aggregation type")
+    parser.add_argument("-n", "--projection_years", type=between(0,1000,int), default=5, help="Number of years to project")
+    parser.add_argument("-r", "--interest_rate", type=between(-0.2,0.3), default=0.03, help="Annual interest rate (e.g., 0.03 for 3pc)")
+    parser.add_argument("-agg", "--aggregation_type", default="sum", choices=["year_record", "sum_year", "sum_record", "sum"], help="Aggregation type")
     parser.add_argument("-l", "--log_file", help="Optional log file for output")
     parser.add_argument("-o", "--output_file", help="Optional CSV output file")
-    parser.add_argument("-rec", "--record", type=int, default=None, help="Optional: single record (1-based index) from the model point file to process")
+    parser.add_argument("-rec", "--record", type=between(1,math.inf,int), default=None, help="Optional: single record (1-based index) from the model point file to process")
     parser.add_argument("-d", "--debug", action="store_true", help="Enable debug mode")
 
     return parser.parse_args()
@@ -32,7 +42,7 @@ def parse_args():
 # ------------------------------------------------
 # Model point file
 # ------------------------------------------------
-def read_model_points(path, debug:bool = False):
+def read_model_points(path:str, debug:bool = False):
     if not os.path.exists(path):
         raise FileNotFoundError(f"Model point file not found: {path}")
     df = pd.read_csv(path, dtype={
@@ -52,10 +62,18 @@ def read_model_points(path, debug:bool = False):
 # ------------------------------------------------
 # Run model for one model point
 # ------------------------------------------------
-def run_model_point(row, assets_folder, projection_years, interest_rate, debug: bool=False):
+def run_model_point(
+    row:ModelPoint, 
+    assets_folder:str, 
+    projection_years:int, 
+    interest_rate:float, 
+    debug: bool=False
+) -> pd.DataFrame:
+
+
     global mortality_cache
 
-    mortality_file = str(os.path.join(assets_folder, row["mortality"]))
+    mortality_file = str(os.path.join(assets_folder, row.mortality))
     # cache mortality tables
     if mortality_file not in mortality_cache:
         if not isinstance(mortality_file, str):
@@ -71,8 +89,8 @@ def run_model_point(row, assets_folder, projection_years, interest_rate, debug: 
 
     df = calculate_pension_cashflows(
         mortality_df=mortality_df,  # pass pre-loaded mortality data frame
-        starting_age=row["age_at_vdate"],
-        base_benefit=row["benefit_pa"],
+        starting_age=row.age_at_vdate,
+        base_benefit=row.benefit_pa,
         n_years=projection_years,
         discount_rate=interest_rate,
         debug=debug
@@ -89,7 +107,7 @@ def run_all_model_points(mp_df, args):
     results = []
 
     
-    for _, row in mp_df.iterrows():
+    for row in mp_df.itertuples(index=False, name="ModelPoint"):
         df = run_model_point(
             row,
             args.assets_folder,
