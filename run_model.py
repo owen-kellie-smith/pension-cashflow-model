@@ -148,7 +148,7 @@ def write_output(df, output_file):
 def copy_all_output_to_log(filename):
     class Tee:
         def __init__(self, filename):
-            self.file = open(filename, "w")
+            self.file = open(filename, "a")
             self.stdout = sys.stdout
 
         def write(self, data):
@@ -170,8 +170,10 @@ def main():
     args = parse_args()
 
     if not( args.log_file is None):
+        with open(args.log_file, "w") as f:
+            f.write("Command used:\n")
+            f.write(" ".join(sys.argv) + "\n\n")
         copy_all_output_to_log(args.log_file)
-        args.debug = True
 
     mp_df = read_model_points(args.model_point_file, debug=args.debug)
 
