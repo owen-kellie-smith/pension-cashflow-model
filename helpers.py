@@ -57,6 +57,7 @@ def copy_all_output_to_log(filename):
         def write(self, data):
             self.stdout.write(data)   # print to terminal
             self.file.write(data)     # write to log file
+            self.file.flush()
 
         def flush(self):
             self.stdout.flush()

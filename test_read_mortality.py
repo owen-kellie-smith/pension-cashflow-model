@@ -18,7 +18,7 @@ def test_read_excel_mortality_table():
     excel_file.seek(0)  # Reset pointer to the beginning
 
     # Call the function with the in-memory "file"
-    result = read_excel_mortality_table(excel_file, skip_rows=0)
+    result = read_excel_mortality_table(excel_file, skip_rows=0, debug=True)
 
     # Expected DataFrame
     expected = pd.DataFrame({

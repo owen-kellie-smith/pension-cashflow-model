@@ -162,3 +162,17 @@ def test_model_runs_without_error_with_log():
     print("STDERR:", result.stderr)
     
 #    assert result.returncode == 0, "model.py did not run successfully"
+
+def test_survival_function_debug_runs(capsys):
+    import pandas as pd
+    from model import survival_function
+
+    mortality_df = pd.DataFrame({
+        "age": [65, 66, 67],
+        "qx": [0.01, 0.02, 0.03]
+    })
+
+    survival_function(65, 3, mortality_df, debug=True)
+
+    captured = capsys.readouterr()
+    assert "age_start" in captured.out

@@ -38,7 +38,7 @@ def survival_function(age_start: float, years: int, mortality_df: pd.DataFrame, 
     qx_interp = np.interp(target_ages, ages, qx, left=0.0, right=1.0)
 
     survival = np.cumprod(1 - qx_interp)
-    if (debug):
+    if debug:
         print("\n age_start:", age_start)
         print("\n target_ages:", target_ages)
         print("\n qx_interp:", qx_interp)

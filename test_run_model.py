@@ -39,7 +39,7 @@ def test_read_model_points(tmp_path):
     df = pd.DataFrame({"age_at_vdate": [30.0], "benefit_pa": [1000.0], "mortality": ["mort.csv"]})
     df.to_csv(csv_file, index=False)
 
-    result = run_model.read_model_points(str(csv_file))
+    result = run_model.read_model_points(str(csv_file), debug=True)
     pd.testing.assert_frame_equal(result, df)
 
 def test_read_model_points_file_not_found():
@@ -70,7 +70,7 @@ def test_run_model_point(mock_calc, mock_read_mort, tmp_path):
     mortality_file.write_text("dummy")
 
     row = {"age_at_vdate": 30, "benefit_pa": 1000, "mortality": "mort.csv"}
-    df = run_model.run_model_point(row, str(tmp_path), 10, 0.03)
+    df = run_model.run_model_point(row, str(tmp_path), 10, 0.03, debug=True)
 
     pd.testing.assert_frame_equal(df, mock_df)
     mock_calc.assert_called_once_with(
@@ -79,13 +79,13 @@ def test_run_model_point(mock_calc, mock_read_mort, tmp_path):
         base_benefit=1000,
         n_years=10,
         discount_rate=0.03,
-        debug=False
+        debug=True
     )
 
 def test_run_model_point_mortality_file_not_found():
     row = {"age_at_vdate": 30, "benefit_pa": 1000, "mortality": "missing.csv"}
     with pytest.raises(FileNotFoundError):
-        run_model.run_model_point(row, "nonexistent_folder", 10, 0.03)
+        run_model.run_model_point(row, "nonexistent_folder", 10, 0.03, debug=True)
 
 
 # ------------------------------------------------
