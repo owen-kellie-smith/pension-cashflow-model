@@ -1,7 +1,23 @@
-import pandas as pd 
 import os
 import sys
-# pandas is data-processing library
+import argparse
+
+import pandas as pd 
+
+def between(min_val, max_val, cast=float):
+    def validator(value):
+        try:
+            v = cast(value)
+        except ValueError:
+            raise argparse.ArgumentTypeError(f"Must be {cast.__name__}")
+
+        if not (min_val <= v <= max_val):
+            raise argparse.ArgumentTypeError(
+                f"Must be between {min_val} and {max_val}"
+            )
+        return v
+
+    return validator
 
 def read_excel_mortality_table(filepath: str, skip_rows: int = 2, age_col: str = "Age x", qx_col: str = "Durations 0+", debug: bool=False ) -> pd.DataFrame:
   """

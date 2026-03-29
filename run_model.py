@@ -1,10 +1,13 @@
-import pandas as pd
 import argparse
 import os
 import sys
-from model import calculate_pension_cashflows
-from helpers import read_excel_mortality_table, copy_all_output_to_log
+
+import pandas as pd
 import numpy as np
+
+from model import calculate_pension_cashflows
+from helpers import read_excel_mortality_table, copy_all_output_to_log, between
+
 mortality_cache = {}  
 
 # ------------------------------------------------
@@ -15,8 +18,8 @@ def parse_args():
 
     parser.add_argument("-mp", "--model_point_file", required=True, help="Path to model point file (CSV)")
     parser.add_argument("-a", "--assets_folder", required=True, help="Path to assets folder containing mortality files")
-    parser.add_argument("-n", "--projection_years", type=int, required=True, help="Number of years to project")
-    parser.add_argument("-r", "--interest_rate", type=float, required=True, help="Annual interest rate (e.g., 0.03 for 3pc)")
+    parser.add_argument("-n", "--projection_years", type=between(0,1000,int), required=True, help="Number of years to project")
+    parser.add_argument("-r", "--interest_rate", type=between(-0.2,0.3), required=True, help="Annual interest rate (e.g., 0.03 for 3pc)")
     parser.add_argument("-agg", "--aggregation_type", required=True, choices=["year_record", "sum_year", "sum_record", "sum"], help="Aggregation type")
     parser.add_argument("-l", "--log_file", help="Optional log file for output")
     parser.add_argument("-o", "--output_file", help="Optional CSV output file")

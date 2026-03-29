@@ -1,10 +1,15 @@
-import pandas as pd 
-import numpy as np
+# Standard library
 import argparse
 import os
 import sys
-# pandas is data-processing library
-from helpers import read_excel_mortality_table, formatNum, copy_all_output_to_log
+import math
+
+# Third-party libraries
+import pandas as pd 
+import numpy as np
+
+# Local application imports
+from helpers import read_excel_mortality_table, formatNum, copy_all_output_to_log, between
 
 # ------------------------------------------------
 # Argument parsing
@@ -12,10 +17,10 @@ from helpers import read_excel_mortality_table, formatNum, copy_all_output_to_lo
 def parse_args():
     parser = argparse.ArgumentParser(description="Calculate and display pension cashflow table.")
     parser.add_argument("-mort", "--mortality_file", required=True, help="Path to mortality Excel file")
-    parser.add_argument("-age", "--starting_age", type=float, required=True, help="Starting age")
-    parser.add_argument("-benefit", "--base_benefit", type=float, default=10000, help="Base annual benefit per person")
-    parser.add_argument("-n", "--n_years", type=int, default=5, help="Number of years to project")
-    parser.add_argument("-r", "--discount_rate", type=float, default=0.03, help="Discount rate (e.g., 0.03 for 3pc)")
+    parser.add_argument("-age", "--starting_age", type=between(0,199), required=True, help="Starting age")
+    parser.add_argument("-benefit", "--base_benefit", type=between(0,math.inf), default=10000, help="Base annual benefit per person")
+    parser.add_argument("-n", "--n_years", type=between(0,1000,int), default=5, help="Number of years to project")
+    parser.add_argument("-r", "--discount_rate", type=between(-0.2,0.3), default=0.03, help="Discount rate (e.g., 0.03 for 3pc)")
     parser.add_argument("-d", "--debug", action="store_true", help="Enable debug mode")    
     parser.add_argument("-l", "--log_file", help="Optional log file for output")
     return parser.parse_args()
@@ -25,9 +30,13 @@ def survival_function(age_start: float, years: int, mortality_df: pd.DataFrame, 
     Vectorized survival probability calculation with correct edge handling.
     """
 
+    required_cols = {"age", "qx"}
+    if not required_cols.issubset(mortality_df.columns):
+        raise ValueError("Mortality table must contain columns: age, qx")
+
     # Extract numpy arrays
-    ages = mortality_df["age"].values
-    qx = mortality_df["qx"].values
+    ages = mortality_df["age"].to_numpy()
+    qx = mortality_df["qx"].to_numpy()
 
     # Target ages
     target_ages = age_start + np.arange(years) #np.arange(years) = [0, 1, ..., years-2, years -1]
@@ -66,9 +75,10 @@ def calculate_pension_cashflows(
       if mortality_file is None:
           raise ValueError("Either mortality_file or mortality_df must be provided.")
       mortality_df = read_excel_mortality_table(mortality_file, debug=debug)
+  years = np.arange(1, n_years + 1)
   data = pd.DataFrame({
-    "year": list(range(1, n_years + 1)),
-    "benefit_pp": [base_benefit] * n_years
+    "year": years,
+    "benefit_pp": base_benefit
   })
   # DataFrame is like an Excel sheet i.e. a table. Each item is a column where (key,item) = (column label, Series).
 
@@ -81,7 +91,7 @@ def calculate_pension_cashflows(
   # -----------------------------
   # Discounted cashflows
   # -----------------------------
-  data["discount_factor"] = 1 / ((1 + discount_rate) ** data["year"]) 
+  data["discount_factor"] = (1 + discount_rate) ** (-data["year"]) 
   # adds to data the transformed column discount_factor with formula in terms of existing column labels.
   data["present_value"] = data["cashflow"] * data["discount_factor"]
 
@@ -105,9 +115,9 @@ def calculate_pension_cashflows(
   # -----------------------------
   # Optional: formatted columns for display
   # -----------------------------
-  data["benefit_pp_formatted"] = data["benefit_pp"].apply(formatNum)
-  data["cashflow_formatted"] = data["cashflow"].apply(formatNum)
-  data["present_value_formatted"] = data["present_value"].apply(formatNum)
+  data["benefit_pp_formatted"] = data["benefit_pp"].map(formatNum)
+  data["cashflow_formatted"] = data["cashflow"].map(formatNum)
+  data["present_value_formatted"] = data["present_value"].map(formatNum)
   return data
 
 def print_pension_table(df: pd.DataFrame):
