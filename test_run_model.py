@@ -210,3 +210,29 @@ def test_model_runs_without_error_as_in_README_2():
     print("STDERR:", result.stderr)
     
     assert result.returncode == 0, "model.py did not run successfully"
+
+def test_model_runs_without_error_as_in_README_1_with_log():
+    """
+    Test that running model.py with given arguments completes successfully.
+    """
+    cmd = [
+        sys.executable,  # ensures we use the same Python interpreter
+        "run_model.py",
+        "-mp", "assets/csv/MPF.csv",
+        "-a", "assets/xls",
+        "-n", "10", 
+        "-r", "0.03",
+        "-agg", "sum",
+        "-o", "out_sum.csv",
+        "-l", "out_sum.log",
+        "-d"
+    ]
+
+    result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+    
+    # Debug output in case of failure
+    print("STDOUT:", result.stdout)
+    print("STDERR:", result.stderr)
+    
+    assert result.returncode == 0, "model.py did not run successfully"
+

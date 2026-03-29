@@ -141,3 +141,24 @@ def test_model_runs_without_error():
     print("STDERR:", result.stderr)
     
 #    assert result.returncode == 0, "model.py did not run successfully"
+
+def test_model_runs_without_error_with_log():
+    cmd = [
+        sys.executable,  # ensures we use the same Python interpreter
+        "model.py",
+        "-mort", "assets/xls/pma92.xls",
+        "-age", "65",
+        "-benefit", "10000",
+        "-n10",
+        "-r", "0.03",
+        "-l", "out_model.log",
+        "-d"
+    ]
+
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    
+    # Debug output in case of failure
+    print("STDOUT:", result.stdout)
+    print("STDERR:", result.stderr)
+    
+#    assert result.returncode == 0, "model.py did not run successfully"

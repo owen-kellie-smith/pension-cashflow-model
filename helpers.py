@@ -1,5 +1,6 @@
 import pandas as pd 
-import numpy as np
+import os
+import sys
 # pandas is data-processing library
 
 def read_excel_mortality_table(filepath: str, skip_rows: int = 2, age_col: str = "Age x", qx_col: str = "Durations 0+", debug: bool=False ) -> pd.DataFrame:
@@ -34,6 +35,7 @@ def read_excel_mortality_table(filepath: str, skip_rows: int = 2, age_col: str =
   mortality["age"] = mortality["age"].astype(int)
   mortality["qx"] = mortality["qx"].astype(float)
   if debug:
+      pd.set_option('display.max_rows', None)
       print(f"\n {filepath} mortality:\n {mortality}")
 
   return mortality
@@ -46,27 +48,41 @@ def formatNum(x: float) -> str:
   #{ number: format }
 
 
-def survival_function(age_start: float, years: int, mortality_df: pd.DataFrame, debug = False) -> pd.Series:
-    """
-    Vectorized survival probability calculation with correct edge handling.
-    """
+def copy_all_output_to_log(filename):
+    class Tee:
+        def __init__(self, filename):
+            self.file = open(filename, "a")
+            self.stdout = sys.stdout
 
-    # Extract numpy arrays
-    ages = mortality_df["age"].values
-    qx = mortality_df["qx"].values
+        def write(self, data):
+            self.stdout.write(data)   # print to terminal
+            self.file.write(data)     # write to log file
 
-    # Target ages
-    target_ages = age_start + np.arange(years) #np.arange(years) = [0, 1, ..., years-2, years -1]
+        def flush(self):
+            self.stdout.flush()
+            self.file.flush()
 
-    # NEW: np.interp with explicit bounds handling
-    # values below min(ages) -> 0.0 (no death)
-    # values above max(ages) -> 1.0 (certain death)
-    qx_interp = np.interp(target_ages, ages, qx, left=0.0, right=1.0)
+    sys.stdout = Tee(filename)
 
-    survival = np.cumprod(1 - qx_interp)
-    if (debug):
-        print("\n age_start:", age_start)
-        print("\n survival:", survival)
-        print("\n pd.Series(survival)", pd.Series(survival))
-    return pd.Series(survival)
+def initialize_log_file(log_file, calling_file):
+    if not( log_file is None):
+        with open(log_file, "w") as f:
+            f.write(calling_file)
+            f.write("\nCommand used:\n")
+            f.write(" ".join(sys.argv) + "\n\n")
+        copy_all_output_to_log(log_file)
 
+# ------------------------------------------------
+# Main
+# ------------------------------------------------
+def main():
+
+    full_path = os.path.abspath(__file__)
+    print(full_path)
+    print("is called by other script(s).\n")
+
+# ------------------------------------------------
+# Only run if CLI calls .py directly
+# ------------------------------------------------
+if __name__ == "__main__":
+    main()

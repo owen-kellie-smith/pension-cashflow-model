@@ -1,7 +1,52 @@
 import pandas as pd 
+import numpy as np
 import argparse
+import os
+import sys
 # pandas is data-processing library
-from helpers import read_excel_mortality_table, formatNum, survival_function
+from helpers import read_excel_mortality_table, formatNum, copy_all_output_to_log
+
+# ------------------------------------------------
+# Argument parsing
+# ------------------------------------------------
+def parse_args():
+    parser = argparse.ArgumentParser(description="Calculate and display pension cashflow table.")
+    parser.add_argument("-mort", "--mortality_file", required=True, help="Path to mortality Excel file")
+    parser.add_argument("-age", "--starting_age", type=float, required=True, help="Starting age")
+    parser.add_argument("-benefit", "--base_benefit", type=float, default=10000, help="Base annual benefit per person")
+    parser.add_argument("-n", "--n_years", type=int, default=5, help="Number of years to project")
+    parser.add_argument("-r", "--discount_rate", type=float, default=0.03, help="Discount rate (e.g., 0.03 for 3pc)")
+    parser.add_argument("-d", "--debug", action="store_true", help="Enable debug mode")    
+    parser.add_argument("-l", "--log_file", help="Optional log file for output")
+    return parser.parse_args()
+
+def survival_function(age_start: float, years: int, mortality_df: pd.DataFrame, debug = False) -> pd.Series:
+    """
+    Vectorized survival probability calculation with correct edge handling.
+    """
+
+    # Extract numpy arrays
+    ages = mortality_df["age"].values
+    qx = mortality_df["qx"].values
+
+    # Target ages
+    target_ages = age_start + np.arange(years) #np.arange(years) = [0, 1, ..., years-2, years -1]
+
+    # NEW: np.interp with explicit bounds handling
+    # values below min(ages) -> 0.0 (no death)
+    # values above max(ages) -> 1.0 (certain death)
+    qx_interp = np.interp(target_ages, ages, qx, left=0.0, right=1.0)
+
+    survival = np.cumprod(1 - qx_interp)
+    if (debug):
+        print("\n age_start:", age_start)
+        print("\n target_ages:", target_ages)
+        print("\n qx_interp:", qx_interp)
+        print("\n survival:", survival)
+        print("\n pd.Series(survival):")
+        print(pd.Series(survival))
+    return pd.Series(survival)
+
 
 def calculate_pension_cashflows(
     mortality_file: str = None,
@@ -81,15 +126,16 @@ def print_pension_table(df: pd.DataFrame):
 # CLI main function
 # -----------------------------
 def main_cli():
-    parser = argparse.ArgumentParser(description="Calculate and display pension cashflow table.")
-    parser.add_argument("-mort", "--mortality_file", required=True, help="Path to mortality Excel file")
-    parser.add_argument("-age", "--starting_age", type=float, required=True, help="Starting age")
-    parser.add_argument("-benefit", "--base_benefit", type=float, default=10000, help="Base annual benefit per person")
-    parser.add_argument("-n", "--n_years", type=int, default=5, help="Number of years to project")
-    parser.add_argument("-r", "--discount_rate", type=float, default=0.03, help="Discount rate (e.g., 0.03 for 3pc)")
-    parser.add_argument("-d", "--debug", action="store_true", help="Enable debug mode")
     
-    args = parser.parse_args()
+    args = parse_args()
+
+    if not( args.log_file is None):
+        with open(args.log_file, "w") as f:
+            full_path = os.path.abspath(__file__)
+            f.write(full_path)
+            f.write("\nCommand used:\n")
+            f.write(" ".join(sys.argv) + "\n\n")
+        copy_all_output_to_log(args.log_file)
 
     df = calculate_pension_cashflows(
         mortality_file=args.mortality_file,

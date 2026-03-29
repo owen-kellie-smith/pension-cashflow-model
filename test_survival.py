@@ -1,4 +1,4 @@
-from helpers import survival_function
+from model import survival_function
 import pandas as pd
 import pytest
 

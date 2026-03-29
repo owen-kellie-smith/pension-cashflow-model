@@ -3,7 +3,7 @@ import argparse
 import os
 import sys
 from model import calculate_pension_cashflows
-from helpers import read_excel_mortality_table
+from helpers import read_excel_mortality_table, copy_all_output_to_log
 import numpy as np
 mortality_cache = {}  
 
@@ -57,11 +57,14 @@ def run_model_point(row, assets_folder, projection_years, interest_rate, debug: 
     if mortality_file not in mortality_cache:
         if not isinstance(mortality_file, str):
             raise TypeError(f"Expected string for mortality file path, got {type(mortality_file)}")
+        if not os.path.exists(mortality_file):
+            raise FileNotFoundError(f"Mortality file not found: {mortality_file}")
         mortality_cache[mortality_file] = read_excel_mortality_table(mortality_file, debug=debug)
     mortality_df = mortality_cache[mortality_file]
 
-    if not os.path.exists(mortality_file):
-        raise FileNotFoundError(f"Mortality file not found: {mortality_file}")
+    if debug:
+        print("\nMortality file path:")
+        print(mortality_file)
 
     df = calculate_pension_cashflows(
         mortality_df=mortality_df,  # pass pre-loaded mortality data frame
@@ -92,6 +95,10 @@ def run_all_model_points(mp_df, args):
             debug=args.debug
         )
         results.append(df)
+
+    if args.debug:
+        print("\nrun_all_model_points.results:")
+        print(results)
 
     return results
 
@@ -145,21 +152,6 @@ def write_output(df, output_file):
     df.to_csv(output_file)
     print(f"\nResults written to {output_file}")
 
-def copy_all_output_to_log(filename):
-    class Tee:
-        def __init__(self, filename):
-            self.file = open(filename, "a")
-            self.stdout = sys.stdout
-
-        def write(self, data):
-            self.stdout.write(data)   # print to terminal
-            self.file.write(data)     # write to log file
-
-        def flush(self):
-            self.stdout.flush()
-            self.file.flush()
-
-    sys.stdout = Tee(filename)
 
 
 # ------------------------------------------------
@@ -171,7 +163,9 @@ def main():
 
     if not( args.log_file is None):
         with open(args.log_file, "w") as f:
-            f.write("Command used:\n")
+            full_path = os.path.abspath(__file__)
+            f.write(full_path)
+            f.write("\nCommand used:\n")
             f.write(" ".join(sys.argv) + "\n\n")
         copy_all_output_to_log(args.log_file)
 
