@@ -106,7 +106,7 @@ def run_all_model_points(mp_df, args):
 
     results = []
 
-    
+
     for row in mp_df.itertuples(index=False, name="ModelPoint"):
         df = run_model_point(
             row,
