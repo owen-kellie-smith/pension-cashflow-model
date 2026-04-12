@@ -96,7 +96,6 @@ year
 ```
 In this case the benefit_pp of 50,000 per year is simply 5 records * 10,000 / year (per record) = 50,000 per year.  
 
-
-
+The expected output is equivalent to the corresponding output (for equivalent inputs) run via a C# model in https://github.com/owen-kellie-smith/pension-cashflow-csharp.
 
 
